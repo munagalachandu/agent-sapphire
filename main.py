@@ -1,9 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from datetime import datetime
-from openai import OpenAI   # NEW correct import
-
-client = OpenAI()
+import openai  # or Groq or any LLM client
 
 app = FastAPI(title="Agentic AI Backend")
 
@@ -11,15 +9,26 @@ app = FastAPI(title="Agentic AI Backend")
 # INTERNAL STATE (SIMULATED)
 # -------------------------
 
-latest_data = {
-    "heart_rate": 95,
-    "rmssd": 20,
-    "breath_rate": 16,
-    "activity_level": 0.4,
-    "resting_hr": 70,
-    "baseline_rmssd": 40,
-    "avg_hr_recent": 75
+# Assume only 1 user
+latest_data ={
+  "heart_rate": 110,
+  "rmssd": 25,
+  "breath_rate": 16,
+  "activity_level": 0.2,
+  "resting_hr": 70,
+  "baseline_rmssd": 40,
+  "avg_hr_recent": 85
 }
+
+
+
+
+
+last_detected_case = None
+last_priority = None
+last_notification_needed = False
+last_notification_text = None
+
 
 # -------------------------
 # RULE-BASED DETECTION
@@ -34,7 +43,7 @@ def detect_case(data):
     baseline_hrv = data["baseline_rmssd"]
     avg_recent = data["avg_hr_recent"]
 
-    # HIGH PRIORITY (breathing screen)
+    # HIGH PRIORITY CASES (Immediate popup)
     if hr > 120 and hrv < 20 and br > 20 and activity < 0.1:
         return "panic_warning", "high"
 
@@ -50,7 +59,7 @@ def detect_case(data):
     if hrv < 15:
         return "very_low_hrv", "high"
 
-    # MEDIUM PRIORITY (popup)
+    # MEDIUM PRIORITY
     if hr > avg_recent + 15 and hrv < baseline_hrv:
         return "stress_spike", "medium"
 
@@ -58,6 +67,7 @@ def detect_case(data):
         return "fatigue_trend", "medium"
 
     # LOW PRIORITY
+    # (Example: mild stress but not requiring popup)
     if hr > avg_recent + 5:
         return "mild_stress", "low"
 
@@ -76,22 +86,29 @@ def generate_notification(case):
     prompt = f"""
     Generate a short (under 20 words) supportive notification for case: {case}.
     Tone: gentle, calming, non-medical, non-diagnostic.
+    Examples:
+    - stress_spike: "You're a bit stressed. Try a calming breath or talk to our assistant."
+    - fatigue_trend: "You've been tired lately. A short break may help."
     """
 
-    response = client.chat.completions.create(
+    # Replace with your model: Groq, OpenAI, etc.
+    response = openai.ChatCompletion.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}]
     )
 
-    return response.choices[0].message.content
+    return response["choices"][0]["message"]["content"]
 
 
 # -------------------------
-# STATUS ENDPOINT
+# STATUS ENDPOINT (FRONTEND ONLY CALLS THIS)
 # -------------------------
 
 @app.get("/status")
 def get_status():
+    global last_detected_case, last_priority, last_notification_needed, last_notification_text
+
+    # Run detection on latest wearable data
     case, priority = detect_case(latest_data)
 
     # HIGH PRIORITY → breathing screen only
@@ -103,7 +120,7 @@ def get_status():
             "notification_text": None
         }
 
-    # MEDIUM PRIORITY → popup needed
+    # MEDIUM PRIORITY → show popup with generated text
     if priority == "medium":
         notif_text = generate_notification(case)
         return {
@@ -113,7 +130,7 @@ def get_status():
             "notification_text": notif_text
         }
 
-    # LOW PRIORITY
+    # LOW PRIORITY → send to chatbot but no popup
     if priority == "low":
         return {
             "case": case,
@@ -122,7 +139,7 @@ def get_status():
             "notification_text": None
         }
 
-    # LOG ONLY / NONE
+    # LOG ONLY or NO EVENTS
     return {
         "case": case,
         "priority": "none",
@@ -132,7 +149,7 @@ def get_status():
 
 
 # -------------------------
-# UPDATE WEARABLE DATA
+# OPTIONAL: UPDATE WEARABLE DATA FROM EXTERNAL SOURCE
 # -------------------------
 
 class WearableUpdate(BaseModel):
@@ -149,4 +166,4 @@ class WearableUpdate(BaseModel):
 def update_data(data: WearableUpdate):
     global latest_data
     latest_data = data.dict()
-    return {"status": "updated"}
+    return {"status": "updated"} 
