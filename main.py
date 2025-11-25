@@ -11,14 +11,15 @@ app = FastAPI(title="Agentic AI Backend")
 
 # Assume only 1 user
 latest_data = {
-    "heart_rate": 120,
-    "rmssd": 10,
-    "breath_rate":22,
-    "activity_level": 0.01,
-    "resting_hr": 70,
-    "baseline_rmssd": 40,
-    "avg_hr_recent": 75
+  "heart_rate": 120,
+  "rmssd": 10,
+  "breath_rate": 22,
+  "activity_level": 0.01,
+  "resting_hr": 70,
+  "baseline_rmssd": 40,
+  "avg_hr_recent": 75
 }
+
 
 last_detected_case = None
 last_priority = None
