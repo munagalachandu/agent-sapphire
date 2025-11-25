@@ -11,13 +11,13 @@ app = FastAPI(title="Agentic AI Backend")
 
 # Assume only 1 user
 latest_data ={
-  "heart_rate": 110,
-  "rmssd": 25,
+  "heart_rate": 100,       # <= resting_hr + 15 (not a high alert)
+  "rmssd": 30,             # >= baseline * 0.7 (not a high alert)
   "breath_rate": 16,
   "activity_level": 0.2,
   "resting_hr": 70,
-  "baseline_rmssd": 40,
-  "avg_hr_recent": 85
+  "baseline_rmssd": 40,    # baseline_hrv * 0.7 = 28 → rmssd=30 passes
+  "avg_hr_recent": 80      # 100 > 80+15 → triggers stress_spike (medium)
 }
 
 
