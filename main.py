@@ -11,7 +11,7 @@ app = FastAPI(title="Agentic AI Backend")
 
 # Assume only 1 user
 latest_data = {
-    "heart_rate": 122,
+    "heart_rate": 120,
     "rmssd": 10,
     "breath_rate":22,
     "activity_level": 0.01,
