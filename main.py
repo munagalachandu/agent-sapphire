@@ -10,19 +10,15 @@ app = FastAPI(title="Agentic AI Backend")
 # -------------------------
 
 # Assume only 1 user
-latest_data ={
-  "heart_rate": 100,       # <= resting_hr + 15 (not a high alert)
-  "rmssd": 30,             # >= baseline * 0.7 (not a high alert)
-  "breath_rate": 16,
-  "activity_level": 0.2,
-  "resting_hr": 70,
-  "baseline_rmssd": 40,    # baseline_hrv * 0.7 = 28 → rmssd=30 passes
-  "avg_hr_recent": 80      # 100 > 80+15 → triggers stress_spike (medium)
+latest_data = {
+    "heart_rate": 122,
+    "rmssd": 10,
+    "breath_rate":22,
+    "activity_level": 0.01,
+    "resting_hr": 70,
+    "baseline_rmssd": 40,
+    "avg_hr_recent": 75
 }
-
-
-
-
 
 last_detected_case = None
 last_priority = None
@@ -166,4 +162,4 @@ class WearableUpdate(BaseModel):
 def update_data(data: WearableUpdate):
     global latest_data
     latest_data = data.dict()
-    return {"status": "updated"} 
+    return {"status": "updated"}
