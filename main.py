@@ -14,11 +14,12 @@ latest_data ={
   "heart_rate": 95,
   "rmssd": 20,
   "breath_rate": 16,
-  "activity_level": 0.3,
+  "activity_level": 0.4,
   "resting_hr": 70,
   "baseline_rmssd": 40,
   "avg_hr_recent": 75
 }
+
 
 
 
