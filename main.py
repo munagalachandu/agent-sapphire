@@ -13,13 +13,13 @@ app = FastAPI(title="Agentic AI Backend")
 # hr (88) > resting_hr + 15 (85) ✓
 # rmssd (28) < baseline_rmssd * 0.75 (30) ✓
 latest_data = {
-  "heart_rate": 89,           # Elevated (70 + 18)
-  "rmssd": 28,                # Below 75% of baseline (40 * 0.75 = 30)
-  "breath_rate": 16,
-  "activity_level": 0.3,
-  "resting_hr": 70,
-  "baseline_rmssd": 40,
-  "avg_hr_recent": 70
+    "heart_rate": 115,         # 70 + 45 → above +40
+    "rmssd": 20,               # 40 * 0.55 = 22 → below
+    "breath_rate": 24,         # > 22
+    "activity_level": 0.05,    # < 0.1
+    "resting_hr": 70,
+    "baseline_rmssd": 40,
+    "avg_hr_recent": 70
 }
 
 # Initialize Groq client
